@@ -64,6 +64,12 @@ namespace DVLD
 
         bool IsLicenseValid()
         {
+            if (License.LicenseClassID != 3)
+            {
+            MessageBox.Show("Cannot make an international license of this class! Only Class 3 is allowed (Ordinary License).", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return false;
+            }
+            
             if (License.IsActive == false)
             {
                 MessageBox.Show("License with ID [" + License.LicenseID + "] is Inactive!", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
