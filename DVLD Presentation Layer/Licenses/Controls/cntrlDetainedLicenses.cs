@@ -221,6 +221,7 @@ namespace DVLD
         {
             Form frm = new frmReleaseDetainedLicense(-1);
             frm.ShowDialog();
+            _RefreshDetainedLicensesList();
         }
 
         private void cmsShowPersonDetails_Click(object sender, EventArgs e)
