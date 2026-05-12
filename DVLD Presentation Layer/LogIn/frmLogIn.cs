@@ -1,4 +1,4 @@
-﻿using DVLDBusinessLayer;
+using DVLDBusinessLayer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -17,6 +17,22 @@ namespace DVLD
         public frmLogIn()
         {
             InitializeComponent();
+        }
+
+        private void frmLogIn_Load(object sender, EventArgs e)
+        {
+            chkRememberMe.Checked = true;
+
+            if (clsGlobalSettings.LoadCredentialsFromRegistry())
+            {
+                txtUsername.Text = clsGlobalSettings.Username;
+                txtPassword.Text = clsGlobalSettings.Password;
+            }
+
+            if (!string.IsNullOrEmpty(txtUsername.Text) && !string.IsNullOrEmpty(txtPassword.Text))
+                btnLogIn.Select();
+            else
+                txtUsername.Select();
         }
 
         private void frmLogIn_Paint(object sender, PaintEventArgs e)
@@ -61,8 +77,6 @@ namespace DVLD
 
             clsUser user = clsUser.FindUserByUsernameAndPassword(username, password);
 
-            //chkRememberMe not implemented yet
-
             if (user != null && user.Username == username && user.Password == password)
             {
                 if (!user.IsActive)
@@ -73,14 +87,18 @@ namespace DVLD
 
                 clsGlobalSettings.CurrentUser = user;
 
+                if (chkRememberMe.Checked)
+                    clsGlobalSettings.SaveCredentialsInRegistry(username, password);
+                else
+                {
+                    txtUsername.Text = "";
+                    txtPassword.Text = "";
+                    clsGlobalSettings.SaveCredentialsInRegistry("", "");
+                }
+
                 Form frm = new frmMainMenu(this);
                 this.Hide();
                 frm.ShowDialog();
-
-                txtUsername.ResetText();
-                txtUsername.Focus();
-                txtPassword.ResetText();
-                errorProvider1.Clear();
             }
             else
             {
