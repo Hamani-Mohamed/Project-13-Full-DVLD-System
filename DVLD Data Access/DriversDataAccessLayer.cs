@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Configuration;
 
 namespace DVLDDataAccess
 {
@@ -8,7 +9,7 @@ namespace DVLDDataAccess
     {
         public static bool GetDriverInfoByDriverID(int DriverID, ref int PersonID, ref int CreatedByUserID, ref DateTime CreatedDate)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select * from Drivers where DriverID = @DriverID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -32,9 +33,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -48,7 +50,7 @@ namespace DVLDDataAccess
 
         public static bool GetDriverInfoByPersonID(ref int DriverID, int PersonID, ref int CreatedByUserID, ref DateTime CreatedDate)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select * from Drivers where PersonID = @PersonID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -72,9 +74,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -88,7 +91,7 @@ namespace DVLDDataAccess
 
         public static int AddNewDriver(int PersonID, int CreatedByUserID, DateTime CreatedDate)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"insert into Drivers (PersonID, CreatedByUserID, CreatedDate)
                             values (@PersonID, @CreatedByUserID, @CreatedDate);
                             select SCOPE_IDENTITY();";
@@ -111,9 +114,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -126,7 +129,7 @@ namespace DVLDDataAccess
 
         public static bool DeleteDriver(int DriverID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"delete from Drivers
                         where DriverID = @DriverID";
 
@@ -142,8 +145,10 @@ namespace DVLDDataAccess
                 RowsAffected = command.ExecuteNonQuery();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -157,7 +162,7 @@ namespace DVLDDataAccess
 
         public static DataTable GetAllDrivers()
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * from Drivers_View";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -175,9 +180,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -190,7 +195,7 @@ namespace DVLDDataAccess
 
         public static bool DoesDriverExistByDriverID(int DriverID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select found = 1 from Drivers where DriverID = @DriverID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -208,8 +213,10 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -223,7 +230,7 @@ namespace DVLDDataAccess
 
         public static bool DoesDriverExistByPersonID(int PersonID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select found = 1 from Drivers where PersonID = @PersonID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -241,8 +248,10 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
