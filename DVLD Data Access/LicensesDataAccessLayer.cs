@@ -1,8 +1,7 @@
-﻿using System;
-using System.ComponentModel;
+using System;
 using System.Data;
 using System.Data.SqlClient;
-using static System.Net.Mime.MediaTypeNames;
+using System.Configuration;
 
 namespace DVLDDataAccess
 {
@@ -13,7 +12,7 @@ namespace DVLDDataAccess
         {
             bool isFound = false;
 
-            using (SqlConnection connection = new SqlConnection(clsSettings.connectionString))
+            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
                 string query = "SELECT * FROM Licenses WHERE LicenseID = @LicenseID";
 
@@ -42,7 +41,12 @@ namespace DVLDDataAccess
                             }
                         }
                     }
-                    catch (Exception) { isFound = false; }
+                    catch (Exception ex)
+                    {
+                        clsSettings.LogError(ex);
+
+                        isFound = false;
+                    }
                 }
             }
             return isFound;
@@ -53,7 +57,7 @@ namespace DVLDDataAccess
         {
             bool isFound = false;
 
-            using (SqlConnection connection = new SqlConnection(clsSettings.connectionString))
+            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
                 string query = "SELECT * FROM Licenses WHERE ApplicationID = @ApplicationID";
 
@@ -82,7 +86,12 @@ namespace DVLDDataAccess
                             }
                         }
                     }
-                    catch (Exception) { isFound = false; }
+                    catch (Exception ex)
+                    {
+                        clsSettings.LogError(ex);
+
+                        isFound = false;
+                    }
                 }
             }
             return isFound;
@@ -93,7 +102,7 @@ namespace DVLDDataAccess
         {
             bool isFound = false;
 
-            using (SqlConnection connection = new SqlConnection(clsSettings.connectionString))
+            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
                 string query = "SELECT * FROM Licenses WHERE CreatedByUserID = @CreatedByUserID";
 
@@ -122,7 +131,12 @@ namespace DVLDDataAccess
                             }
                         }
                     }
-                    catch (Exception) { isFound = false; }
+                    catch (Exception ex)
+                    {
+                        clsSettings.LogError(ex);
+
+                        isFound = false;
+                    }
                 }
             }
             return isFound;
@@ -133,7 +147,7 @@ namespace DVLDDataAccess
         {
             bool isFound = false;
 
-            using (SqlConnection connection = new SqlConnection(clsSettings.connectionString))
+            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
                 string query = "SELECT * FROM Licenses WHERE DriverID = @DriverID";
 
@@ -162,7 +176,12 @@ namespace DVLDDataAccess
                             }
                         }
                     }
-                    catch (Exception) { isFound = false; }
+                    catch (Exception ex)
+                    {
+                        clsSettings.LogError(ex);
+
+                        isFound = false;
+                    }
                 }
             }
             return isFound;
@@ -170,7 +189,7 @@ namespace DVLDDataAccess
 
         public static DataTable GetLocalLicensesHistory(int DriverID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"select LicenseID, ApplicationID, ClassName, IssueDate, ExpirationDate, IsActive from Licenses
                                 inner join LicenseClasses on Licenses.LicenseClass = LicenseClasses.LicenseClassID
                                 where DriverID = @DriverID
@@ -192,9 +211,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -210,7 +229,7 @@ namespace DVLDDataAccess
         {
             int LicenseID = -1;
 
-            using (SqlConnection connection = new SqlConnection(clsSettings.connectionString))
+            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
                 string query = @"INSERT INTO Licenses (ApplicationID, DriverID, LicenseClass, 
                                  IssueDate, ExpirationDate, Notes, PaidFees, IsActive, 
@@ -248,9 +267,9 @@ namespace DVLDDataAccess
                             LicenseID = insertedID;
                         }
                     }
-                    catch (Exception)
+                    catch (Exception ex)
                     {
-                        // log later
+                        clsSettings.LogError(ex);
                     }
                 }
             }
@@ -259,7 +278,7 @@ namespace DVLDDataAccess
 
         public static bool DeactivateLicense(int LicenseID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
             string query = @"UPDATE Licenses 
                      SET IsActive = 0 
@@ -275,9 +294,9 @@ namespace DVLDDataAccess
                 connection.Open();
                 rowsAffected = command.ExecuteNonQuery();
             }
-            catch
+            catch (Exception ex)
             {
-                // log later
+                clsSettings.LogError(ex);
                 return false;
             }
             finally
@@ -290,7 +309,7 @@ namespace DVLDDataAccess
 
         public static int GetActiveLicenseIDByDriverID(int DriverID, int LicenseClassID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
             string query = @"SELECT LicenseID FROM Licenses 
                             INNER JOIN LicenseClasses on Licenses.LicenseClass = LicenseClasses.LicenseClassID
@@ -315,9 +334,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch
+            catch (Exception ex)
             {
-                // log later
+                clsSettings.LogError(ex);
             }
 
             finally
