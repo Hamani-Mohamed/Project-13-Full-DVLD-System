@@ -1,14 +1,15 @@
-﻿using DVLDDataAccess;
+using DVLDDataAccess;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Configuration;
 
 public class clsInternationalLicensesDataAccess
 {
     public static bool GetInternationalLicenseInfoByID(int InternationalLicenseID, ref int ApplicationID, ref int DriverID,
         ref int IssuedUsingLocalLicenseID, ref DateTime IssueDate, ref DateTime ExpirationDate, ref bool IsActive, ref int CreatedByUserID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
         string query = "SELECT * FROM InternationalLicenses WHERE InternationalLicenseID = @InternationalLicenseID";
 
         SqlCommand command = new SqlCommand(query, connection);
@@ -35,8 +36,10 @@ public class clsInternationalLicensesDataAccess
             reader.Close();
         }
 
-        catch (Exception)
+        catch (Exception ex)
         {
+            clsSettings.LogError(ex);
+
             isFound = false;
         }
 
@@ -51,7 +54,7 @@ public class clsInternationalLicensesDataAccess
     public static bool GetInternationalLicenseInfoByApplicationID(ref int InternationalLicenseID, int ApplicationID, ref int DriverID,
         ref int IssuedUsingLocalLicenseID, ref DateTime IssueDate, ref DateTime ExpirationDate, ref bool IsActive, ref int CreatedByUserID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
         string query = "SELECT * FROM InternationalLicenses WHERE ApplicationID = @ApplicationID";
 
         SqlCommand command = new SqlCommand(query, connection);
@@ -77,8 +80,10 @@ public class clsInternationalLicensesDataAccess
             }
             reader.Close();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            clsSettings.LogError(ex);
+
             isFound = false;
         }
         finally
@@ -92,7 +97,7 @@ public class clsInternationalLicensesDataAccess
     public static bool GetInternationalLicenseInfoByDriverID(ref int InternationalLicenseID, ref int ApplicationID, int DriverID,
         ref int IssuedUsingLocalLicenseID, ref DateTime IssueDate, ref DateTime ExpirationDate, ref bool IsActive, ref int CreatedByUserID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
         string query = "SELECT * FROM InternationalLicenses WHERE DriverID = @DriverID";
 
         SqlCommand command = new SqlCommand(query, connection);
@@ -118,8 +123,10 @@ public class clsInternationalLicensesDataAccess
             }
             reader.Close();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            clsSettings.LogError(ex);
+
             isFound = false;
         }
         finally
@@ -133,7 +140,7 @@ public class clsInternationalLicensesDataAccess
     public static int AddNewInternationalLicense(int ApplicationID, int DriverID, int IssuedUsingLocalLicenseID, DateTime IssueDate,
         DateTime ExpirationDate, bool IsActive, int CreatedByUserID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
         string query = @"INSERT INTO InternationalLicenses (ApplicationID, DriverID, 
                          IssuedUsingLocalLicenseID, IssueDate, ExpirationDate, IsActive, CreatedByUserID)
@@ -162,9 +169,9 @@ public class clsInternationalLicensesDataAccess
                 InternationalLicenseID = insertedID;
             }
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // log later
+            clsSettings.LogError(ex);
         }
         finally
         {
@@ -176,7 +183,7 @@ public class clsInternationalLicensesDataAccess
 
     public static bool DeleteInternationalLicense(int InternationalLicenseID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
         string query = "DELETE FROM InternationalLicenses WHERE InternationalLicenseID = @InternationalLicenseID";
         SqlCommand command = new SqlCommand(query, connection);
         command.Parameters.AddWithValue("@InternationalLicenseID", InternationalLicenseID);
@@ -188,8 +195,10 @@ public class clsInternationalLicensesDataAccess
             connection.Open();
             rowsAffected = command.ExecuteNonQuery();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
+            clsSettings.LogError(ex);
+
             return false;
         }
         finally
@@ -203,7 +212,7 @@ public class clsInternationalLicensesDataAccess
     public static DataTable GetAllInternationalLicenses()
     {
         DataTable dt = new DataTable();
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
         string query = @"SELECT 
                                InternationalLicenseID, 
@@ -234,9 +243,9 @@ public class clsInternationalLicensesDataAccess
 
             reader.Close();
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            // log later
+            clsSettings.LogError(ex);
         }
         finally
         {
@@ -248,7 +257,7 @@ public class clsInternationalLicensesDataAccess
 
     public static DataTable GetInternationalLicensesHistory(int DriverID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
         string query = @"select InternationalLicenseID, ApplicationID, IssuedUsingLocalLicenseID, IssueDate, ExpirationDate,
                         IsActive from InternationalLicenses
                         where DriverID = @DriverID
@@ -270,9 +279,9 @@ public class clsInternationalLicensesDataAccess
             }
         }
 
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            clsSettings.LogError(ex);
         }
 
         finally
