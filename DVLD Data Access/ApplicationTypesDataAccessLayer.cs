@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Configuration;
 
 namespace DVLDDataAccess
 {
@@ -8,7 +9,7 @@ namespace DVLDDataAccess
     {
         public static bool GetApplicationInfoByID(int ApplicationTypeID, ref string ApplicationTypeTitle, ref decimal ApplicationFees)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * from ApplicationTypes
                                 WHERE ApplicationTypeID = @ApplicationTypeID";
 
@@ -32,9 +33,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -48,7 +50,7 @@ namespace DVLDDataAccess
 
         public static bool GetApplicationInfoByName(ref int ApplicationTypeID, string ApplicationTypeTitle, ref decimal ApplicationFees)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * from ApplicationTypes
                                 WHERE ApplicationTypeTitle = @ApplicationTypeTitle";
 
@@ -72,9 +74,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -88,7 +91,7 @@ namespace DVLDDataAccess
 
         public static DataTable GetAllApplicationTypes()
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"select * from ApplicationTypes";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -106,9 +109,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -121,7 +124,7 @@ namespace DVLDDataAccess
 
         public static bool UpdateApplicationType(int ApplicationTypeID, string ApplicationTypeTitle, decimal ApplicationFees)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"Update  ApplicationTypes  
                             set ApplicationTypeTitle = @ApplicationTypeTitle, 
                                 ApplicationFees = @ApplicationFees
@@ -140,8 +143,9 @@ namespace DVLDDataAccess
 
                 rowsAffected = command.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
                 return false;
             }
 
