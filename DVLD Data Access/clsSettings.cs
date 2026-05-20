@@ -1,13 +1,21 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System;
+using System.Diagnostics;
 
 namespace DVLDDataAccess
 {
     public static class clsSettings
     {
-        public static string connectionString = "Server = . ; Database = DVLD ; User Id = sa ; Password = sa123456";
+        // ConnectionString moved to App.Config
+        
+        public static void LogError(Exception ex)
+        {
+            string SourceName = "DVLD";
+
+            if (!EventLog.SourceExists(SourceName))
+            {
+                EventLog.CreateEventSource(SourceName, "Application");
+            }
+            EventLog.WriteEntry(SourceName, ex.Message, EventLogEntryType.Error);
+        }
     }
 }
