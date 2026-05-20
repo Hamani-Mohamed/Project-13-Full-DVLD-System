@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Configuration;
 
 namespace DVLDDataAccess
 {
@@ -9,7 +10,7 @@ namespace DVLDDataAccess
         public static bool FindTestAppointmentByID(int TestAppointmentID, ref int TestTypeID, ref int LocalDrivingLicenseApplicationID,
             ref DateTime AppointmentDate, ref decimal PaidFees, ref int CreatedByUserID, ref bool IsLocked, ref int RetakeTestApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * from TestAppointments
                                 WHERE TestAppointmentID = @TestAppointmentID";
 
@@ -38,9 +39,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -55,7 +57,7 @@ namespace DVLDDataAccess
         public static bool FindTestAppointmentByUserID(ref int TestAppointmentID, ref int TestTypeID, ref int LocalDrivingLicenseApplicationID,
             ref DateTime AppointmentDate, ref decimal PaidFees, int CreatedByUserID, ref bool IsLocked, ref int RetakeTestApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * from TestAppointments
                                 WHERE CreatedByUserID = @CreatedByUserID";
 
@@ -84,9 +86,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -101,7 +104,7 @@ namespace DVLDDataAccess
         public static bool FindTestAppointmentByLocalLicenseID(ref int TestAppointmentID, ref int TestTypeID, int LocalDrivingLicenseApplicationID,
         ref DateTime AppointmentDate, ref decimal PaidFees, ref int CreatedByUserID, ref bool IsLocked, ref int RetakeTestApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * from TestAppointments
                                 WHERE LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
 
@@ -130,9 +133,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -147,7 +151,7 @@ namespace DVLDDataAccess
         public static int AddTestAppointment(int TestTypeID, int LocalDrivingLicenseApplicationID,
             DateTime AppointmentDate, decimal PaidFees, int CreatedByUserID, bool IsLocked, int RetakeTestApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"insert into TestAppointments (TestTypeID, LocalDrivingLicenseApplicationID, AppointmentDate, PaidFees, CreatedByUserID,
                             IsLocked, RetakeTestApplicationID)
                             values (@TestTypeID, @LocalDrivingLicenseApplicationID, @AppointmentDate, @PaidFees, @CreatedByUserID, @IsLocked, @RetakeTestApplicationID);
@@ -178,9 +182,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -194,7 +198,7 @@ namespace DVLDDataAccess
         public static bool UpdateTestAppointment(int TestAppointmentID, int TestTypeID, int LocalDrivingLicenseApplicationID,
             DateTime AppointmentDate, decimal PaidFees, int CreatedByUserID, bool IsLocked, int RetakeTestApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"Update  TestAppointments  
                             set TestTypeID = @TestTypeID, 
                                 LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID,
@@ -227,8 +231,10 @@ namespace DVLDDataAccess
 
                 rowsAffected = command.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -242,7 +248,7 @@ namespace DVLDDataAccess
 
         public static DataTable GetPersonTestAppointments(int LocalDrivingLicenseApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"select TestAppointmentID, AppointmentDate, PaidFees, IsLocked from TestAppointments
                             where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
 
@@ -262,9 +268,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -277,7 +283,7 @@ namespace DVLDDataAccess
 
         public static DataTable GetPersonTestAppointmentsByTestTypeID(int LocalDrivingLicenseApplicationID, int TestTypeID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"select TestAppointmentID, AppointmentDate, PaidFees, IsLocked from TestAppointments
                             where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID
                             and TestTypeID = @TestTypeID";
@@ -299,9 +305,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -315,7 +321,7 @@ namespace DVLDDataAccess
         public static int GetTotalTrialsPerTestType(int LocalDrivingLicenseApplicationID, int TestTypeID)
         {
             int TotalTrials = 0;
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
             string query = @"SELECT COUNT(*)
                     FROM TestAppointments 
@@ -335,9 +341,9 @@ namespace DVLDDataAccess
                     TotalTrials = count;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // log later
+                clsSettings.LogError(ex);
             }
             finally { connection.Close(); }
 
@@ -346,7 +352,7 @@ namespace DVLDDataAccess
 
         public static int GetPassedTestCount(int LocalDrivingLicenseApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
             string query = @"SELECT COUNT(*) 
                     FROM TestAppointments
@@ -369,9 +375,9 @@ namespace DVLDDataAccess
                     Count = resultCount;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-                // might log later
+                clsSettings.LogError(ex);
             }
             finally
             {
@@ -383,7 +389,7 @@ namespace DVLDDataAccess
 
         public static bool DoesAppointmentExist(int TestAppointmentID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select found = 1 from TestAppointments where TestAppointmentID = @TestAppointmentID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -401,8 +407,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
                 return false;
             }
 
@@ -416,7 +423,7 @@ namespace DVLDDataAccess
 
         public static bool IsAppointmentActive(int LocalDrivingLicenseApplicationID, int TestTypeID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"select found = 1 from TestAppointments where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID
                             and TestTypeID = @TestTypeID and IsLocked = 0";
 
@@ -436,8 +443,10 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
