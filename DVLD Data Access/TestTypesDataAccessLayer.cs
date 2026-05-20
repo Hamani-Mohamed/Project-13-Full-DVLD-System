@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Configuration;
 
 namespace DVLDDataAccess
 {
@@ -8,7 +9,7 @@ namespace DVLDDataAccess
     {
         public static bool GetTestInfoByID(int TestTypeID, ref string TestTypeTitle, ref string TestTypeDescription, ref decimal TestTypeFees)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * from TestTypes
                                 WHERE TestTypeID = @TestTypeID";
 
@@ -33,9 +34,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -49,7 +51,7 @@ namespace DVLDDataAccess
 
         public static DataTable GetAllTestTypes()
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"select * from TestTypes";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -67,9 +69,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -82,7 +84,7 @@ namespace DVLDDataAccess
 
         public static bool UpdateTestType(int TestTypeID, string TestTypeTitle, string TestTypeDescription, decimal TestTypeFees)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"Update  TestTypes  
                             set TestTypeTitle = @TestTypeTitle, 
                                 TestTypeDescription = @TestTypeDescription, 
@@ -103,8 +105,10 @@ namespace DVLDDataAccess
 
                 rowsAffected = command.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
