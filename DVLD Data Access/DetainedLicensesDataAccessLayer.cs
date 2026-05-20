@@ -1,14 +1,15 @@
-﻿using DVLDDataAccess;
+using DVLDDataAccess;
 using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Configuration;
 
 public class clsDetainedLicenseDataAccess
 {
     public static bool GetDetainedLicenseInfoByID(int DetainID, ref int LicenseID, ref DateTime DetainDate, ref decimal FineFees,
         ref int CreatedByUserID, ref bool IsReleased, ref DateTime ReleaseDate, ref int ReleasedByUserID, ref int ReleaseApplicationID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
         string query = "SELECT * FROM DetainedLicenses WHERE DetainID = @DetainID";
 
         SqlCommand command = new SqlCommand(query, connection);
@@ -36,8 +37,10 @@ public class clsDetainedLicenseDataAccess
             reader.Close();
         }
 
-        catch (Exception)
+        catch (Exception ex)
         {
+            clsSettings.LogError(ex);
+
             isFound = false;
         }
 
@@ -53,7 +56,7 @@ public class clsDetainedLicenseDataAccess
         ref int CreatedByUserID, ref bool IsReleased, ref DateTime ReleaseDate, ref int ReleasedByUserID, ref int ReleaseApplicationID)
     {
         bool isFound = false;
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
         string query = "SELECT TOP 1 * FROM DetainedLicenses WHERE LicenseID = @LicenseID ORDER BY DetainID DESC";
 
@@ -81,8 +84,10 @@ public class clsDetainedLicenseDataAccess
             reader.Close();
         }
 
-        catch (Exception)
+        catch (Exception ex)
         {
+            clsSettings.LogError(ex);
+
             isFound = false;
         }
 
@@ -97,7 +102,7 @@ public class clsDetainedLicenseDataAccess
     public static int AddNewDetainedLicense(int LicenseID, DateTime DetainDate, decimal FineFees, int CreatedByUserID, bool IsReleased,
         DateTime ReleaseDate, int ReleasedByUserID, int ReleaseApplicationID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
         string query = @"INSERT INTO DetainedLicenses 
                          (LicenseID, DetainDate, FineFees, CreatedByUserID, IsReleased, 
@@ -141,9 +146,9 @@ public class clsDetainedLicenseDataAccess
             }
         }
 
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            clsSettings.LogError(ex);
         }
 
         finally
@@ -156,7 +161,7 @@ public class clsDetainedLicenseDataAccess
 
     public static bool ReleaseDetainedLicense(int DetainID, int ReleasedByUserID, int ReleaseApplicationID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
         string query = @"UPDATE DetainedLicenses 
                          SET IsReleased = 1, 
@@ -179,8 +184,10 @@ public class clsDetainedLicenseDataAccess
             rowsAffected = command.ExecuteNonQuery();
         }
 
-        catch (Exception)
+        catch (Exception ex)
         {
+            clsSettings.LogError(ex);
+
             return false;
         }
 
@@ -194,7 +201,7 @@ public class clsDetainedLicenseDataAccess
 
     public static bool IsLicenseDetained(int LicenseID)
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
         string query = "SELECT TOP 1 Found = 1 FROM DetainedLicenses WHERE LicenseID = @LicenseID AND IsReleased = 0";
 
@@ -211,9 +218,9 @@ public class clsDetainedLicenseDataAccess
                 isDetained = true;
         }
 
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            clsSettings.LogError(ex);
         }
 
         finally
@@ -226,7 +233,7 @@ public class clsDetainedLicenseDataAccess
 
     public static DataTable GetAllDetainedLicenses()
     {
-        SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+        SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
 
         string query = @"SELECT * FROM DetainedLicenses_View";
 
@@ -242,9 +249,9 @@ public class clsDetainedLicenseDataAccess
             reader.Close();
         }
 
-        catch (Exception)
+        catch (Exception ex)
         {
-
+            clsSettings.LogError(ex);
         }
 
         finally
