@@ -1,15 +1,27 @@
 using DVLDBusinessLayer;
 using Microsoft.Win32;
 using System;
+using System.Diagnostics;
 using System.Windows.Forms;
 
 namespace DVLD
 {
-    internal class clsGlobalSettings
+    public static class clsGlobalSettings
     {
         public static clsUser CurrentUser;
         public static string Username;
         public static string Password;
+
+        public static void LogError(Exception ex)
+        {
+            string SourceName = "DVLD";
+
+            if (!EventLog.SourceExists(SourceName))
+            {
+                EventLog.CreateEventSource(SourceName, "Application");
+            }
+            EventLog.WriteEntry(SourceName, ex.Message, EventLogEntryType.Error);
+        }
 
         public static void SaveCredentialsInRegistry(string Username, string Password)
         {
@@ -23,6 +35,7 @@ namespace DVLD
 
             catch (Exception ex)
             {
+                LogError(ex);
                 MessageBox.Show(ex.Message);
             }
         }
@@ -46,6 +59,8 @@ namespace DVLD
 
             catch (Exception ex)
             {
+                LogError(ex);
+
                 MessageBox.Show(ex.Message);
                 return false;
             }
