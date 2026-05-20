@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Configuration;
 
 namespace DVLDDataAccess
 {
@@ -8,7 +9,7 @@ namespace DVLDDataAccess
     {
         public static DataTable GetAllCountries()
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select * from Countries";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -26,9 +27,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -41,7 +42,7 @@ namespace DVLDDataAccess
 
         public static bool GetCountryInfoByID(int ID, ref string CountryName)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select * from Countries where CountryID = @CountryID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -63,9 +64,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -79,7 +81,7 @@ namespace DVLDDataAccess
 
         public static bool GetCountryInfoByName(ref int ID, string CountryName)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select * from Countries where CountryName = @CountryName";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -101,9 +103,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
