@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
+using System;
 using System.Data;
 using System.Data.SqlClient;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml.Linq;
+using System.Configuration;
 
 namespace DVLDDataAccess
 {
@@ -13,7 +9,7 @@ namespace DVLDDataAccess
     {
         public static bool GetLocalDrivingLicenseApplicationInfoByID(int LocalDrivingLicenseApplicationID, ref int ApplicationID, ref int LicenseClassID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select * from LocalDrivingLicenseApplications where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -36,9 +32,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -52,7 +49,7 @@ namespace DVLDDataAccess
 
         public static int AddNewLocalLicense(int ApplicationID, int LicenseClassID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"insert into LocalDrivingLicenseApplications (ApplicationID, LicenseClassID)
                             values (@ApplicationID, @LicenseClassID);
                             select SCOPE_IDENTITY();";
@@ -74,9 +71,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -89,7 +86,7 @@ namespace DVLDDataAccess
 
         public static bool UpdateLocalLicense(int LocalDrivingLicenseApplicationID, int ApplicationID, int LicenseClassID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"Update  LocalDrivingLicenseApplications  
                             set ApplicationID = @ApplicationID, 
                                 LicenseClassID = @LicenseClassID
@@ -108,8 +105,10 @@ namespace DVLDDataAccess
 
                 rowsAffected = command.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -123,7 +122,7 @@ namespace DVLDDataAccess
 
         public static bool DeleteLocalLicense(int LocalDrivingLicenseApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"delete from LocalDrivingLicenseApplications
                         where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
 
@@ -139,8 +138,10 @@ namespace DVLDDataAccess
                 RowsAffected = command.ExecuteNonQuery();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -154,7 +155,7 @@ namespace DVLDDataAccess
 
         public static bool DoesLocalLicenseExistByID(int LocalDrivingLicenseApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select found = 1 from LocalDrivingLicenseApplications where LocalDrivingLicenseApplicationID = @LocalDrivingLicenseApplicationID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -172,8 +173,10 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -187,7 +190,7 @@ namespace DVLDDataAccess
 
         public static DataTable GetAllLocalDrivingLicenseApplications()
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select * from LocalDrivingLicenseApplications_View";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -205,9 +208,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
