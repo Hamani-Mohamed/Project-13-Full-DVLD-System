@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Configuration;
 
 namespace DVLDDataAccess
 {
@@ -9,7 +10,7 @@ namespace DVLDDataAccess
         public static bool GetApplicationInfoByID(int ApplicationID, ref int ApplicantPersonID, ref DateTime ApplicationDate, ref int ApplicationTypeID, ref byte ApplicationStatus,
             ref DateTime LastStatusDate, ref decimal PaidFees, ref int CreatedByUserID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * FROM Applications WHERE ApplicationID = @ApplicationID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -37,9 +38,9 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
                 isFound = false;
             }
 
@@ -54,7 +55,7 @@ namespace DVLDDataAccess
         public static bool GetApplicationInfoByPersonID(ref int ApplicationID, int ApplicantPersonID, ref DateTime ApplicationDate, ref int ApplicationTypeID, ref byte ApplicationStatus,
             ref DateTime LastStatusDate, ref decimal PaidFees, ref int CreatedByUserID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * FROM Applications WHERE ApplicantPersonID = @ApplicantPersonID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -82,9 +83,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -99,7 +101,7 @@ namespace DVLDDataAccess
         public static int AddNewApplication(int ApplicantPersonID, DateTime ApplicationDate, int ApplicationTypeID, byte ApplicationStatus,
             DateTime LastStatusDate, decimal PaidFees, int CreatedByUserID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"insert into Applications (ApplicantPersonID, ApplicationDate, ApplicationTypeID, ApplicationStatus, LastStatusDate, PaidFees, CreatedByUserID)
                             values (@ApplicantPersonID, @ApplicationDate, @ApplicationTypeID, @ApplicationStatus, @LastStatusDate, @PaidFees, @CreatedByUserID);
                             select SCOPE_IDENTITY();";
@@ -126,9 +128,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -142,7 +144,7 @@ namespace DVLDDataAccess
         public static bool UpdateApplication(int ApplicationID, int ApplicantPersonID, DateTime ApplicationDate, int ApplicationTypeID, byte ApplicationStatus,
             DateTime LastStatusDate, decimal PaidFees, int CreatedByUserID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"Update  Applications  
                             set ApplicantPersonID = @ApplicantPersonID, 
                                 ApplicationDate = @ApplicationDate, 
@@ -171,8 +173,9 @@ namespace DVLDDataAccess
 
                 rowsAffected = command.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
                 return false;
             }
 
@@ -186,7 +189,7 @@ namespace DVLDDataAccess
 
         public static bool DeleteApplication(int ApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"delete from Applications
                         where ApplicationID = @ApplicationID";
 
@@ -202,8 +205,10 @@ namespace DVLDDataAccess
                 RowsAffected = command.ExecuteNonQuery();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -217,7 +222,7 @@ namespace DVLDDataAccess
 
         public static bool CancelApplication(int ApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"Update  Applications 
                             set ApplicationStatus = 2
                             where ApplicationID = @ApplicationID";
@@ -234,8 +239,10 @@ namespace DVLDDataAccess
                 RowsAffected = command.ExecuteNonQuery();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -249,7 +256,7 @@ namespace DVLDDataAccess
 
         public static DataTable GetAllApplications()
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT * FROM Applications";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -267,9 +274,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -282,7 +289,7 @@ namespace DVLDDataAccess
 
         public static bool DoesApplicationExistByID(int ApplicationID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select found = 1 from Applications where ApplicationID = @ApplicationID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -300,8 +307,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
                 return false;
             }
 
@@ -315,7 +323,7 @@ namespace DVLDDataAccess
 
         public static bool DoesApplicationExistByPersonID(int ApplicantPersonID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select found = 1 from Applications where ApplicantPersonID = @ApplicantPersonID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -333,8 +341,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
                 return false;
             }
 
@@ -348,7 +357,7 @@ namespace DVLDDataAccess
 
         public static bool DoesPersonHaveActiveApplication(int ApplicantPersonID, int LicenseClassID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"select found = 1 from LocalDrivingLicenseFullApplications_View
                             where ApplicantPersonID = @ApplicantPersonID and (ApplicationStatus = 1 or ApplicationStatus = 3)
                             and LicenseClassID = @LicenseClassID";
@@ -369,8 +378,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
                 return false;
             }
 
@@ -385,7 +395,7 @@ namespace DVLDDataAccess
         public static bool SetComplete(int ApplicationID)
         {
             int rowsAffected = 0;
-            using (SqlConnection connection = new SqlConnection(clsSettings.connectionString))
+            using (SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString))
             {
                 string query = @"UPDATE Applications 
                          SET ApplicationStatus = 3, 
@@ -402,7 +412,11 @@ namespace DVLDDataAccess
                         connection.Open();
                         rowsAffected = command.ExecuteNonQuery();
                     }
-                    catch (Exception) { return false; }
+                    catch (Exception ex)
+                    {
+                        clsSettings.LogError(ex);
+                        return false;
+                    }
                 }
             }
             return (rowsAffected > 0);
