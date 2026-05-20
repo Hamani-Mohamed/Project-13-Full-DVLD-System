@@ -1,6 +1,7 @@
-﻿using System;
+using System;
 using System.Data;
 using System.Data.SqlClient;
+using System.Configuration;
 
 namespace DVLDDataAccess
 {
@@ -8,7 +9,7 @@ namespace DVLDDataAccess
     {
         public static bool GetUserInfoByUserID(int UserID, ref int PersonID, ref string Username, ref string Password, ref bool IsActive)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT Users.*, 
                                 LTRIM(RTRIM(REPLACE(REPLACE(ISNULL(People.FirstName, '') + ' ' + ISNULL(People.SecondName, '') + ' ' + ISNULL(People.ThirdName, '') + ' ' + ISNULL(People.LastName, ''), '  ', ' '), '  ', ' '))) as FullName 
                                 FROM Users 
@@ -37,9 +38,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -53,7 +55,7 @@ namespace DVLDDataAccess
 
         public static bool GetUserInfoByPersonID(ref int UserID, int PersonID, ref string Username, ref string Password, ref bool IsActive)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT Users.*, 
                                 LTRIM(RTRIM(REPLACE(REPLACE(ISNULL(People.FirstName, '') + ' ' + ISNULL(People.SecondName, '') + ' ' + ISNULL(People.ThirdName, '') + ' ' + ISNULL(People.LastName, ''), '  ', ' '), '  ', ' '))) as FullName 
                                 FROM Users 
@@ -83,9 +85,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -99,7 +102,7 @@ namespace DVLDDataAccess
 
         public static bool GetUserInfoByUsernameAndPassword(ref int UserID, ref int PersonID, string Username, string Password, ref bool IsActive)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT Users.*, 
                                 LTRIM(RTRIM(REPLACE(REPLACE(ISNULL(People.FirstName, '') + ' ' + ISNULL(People.SecondName, '') + ' ' + ISNULL(People.ThirdName, '') + ' ' + ISNULL(People.LastName, ''), '  ', ' '), '  ', ' '))) as FullName 
                                 FROM Users 
@@ -129,9 +132,10 @@ namespace DVLDDataAccess
                 reader.Close();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-                //Console.WriteLine(ex.Message);
+                clsSettings.LogError(ex);
+
                 isFound = false;
             }
 
@@ -145,7 +149,7 @@ namespace DVLDDataAccess
 
         public static int AddNewUser(int PersonID, string Username, string Password, bool IsActive)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"insert into Users (PersonID, Username, Password, IsActive)
                             values (@PersonID, @Username, @Password, @IsActive);
                             select SCOPE_IDENTITY();";
@@ -169,9 +173,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -184,7 +188,7 @@ namespace DVLDDataAccess
 
         public static bool UpdateUser(int UserID, string Username, string Password, bool IsActive)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"Update  Users  
                             set Username = @Username, 
                                 Password = @Password, 
@@ -205,8 +209,10 @@ namespace DVLDDataAccess
 
                 rowsAffected = command.ExecuteNonQuery();
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -220,7 +226,7 @@ namespace DVLDDataAccess
 
         public static bool DeleteUser(int UserID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"delete from Users
                         where UserID = @UserID";
 
@@ -236,8 +242,10 @@ namespace DVLDDataAccess
                 RowsAffected = command.ExecuteNonQuery();
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -251,7 +259,7 @@ namespace DVLDDataAccess
 
         public static DataTable GetAllUsers()
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = @"SELECT
                                 Users.UserID,
                                 Users.PersonID,
@@ -279,9 +287,9 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                clsSettings.LogError(ex);
             }
 
             finally
@@ -294,7 +302,7 @@ namespace DVLDDataAccess
 
         public static bool DoesUserExistByUserID(int UserID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select found = 1 from Users where UserID = @UserID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -312,8 +320,10 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -327,7 +337,7 @@ namespace DVLDDataAccess
 
         public static bool DoesUserExistByPersonID(int PersonID)
         {
-            SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+            SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
             string query = "select found = 1 from Users where PersonID = @PersonID";
 
             SqlCommand command = new SqlCommand(query, connection);
@@ -345,8 +355,10 @@ namespace DVLDDataAccess
                 }
             }
 
-            catch (Exception)
+            catch (Exception ex)
             {
+                clsSettings.LogError(ex);
+
                 return false;
             }
 
@@ -361,7 +373,7 @@ namespace DVLDDataAccess
         public static bool DoesUserExistByUsername(string Username)
         {
             {
-                SqlConnection connection = new SqlConnection(clsSettings.connectionString);
+                SqlConnection connection = new SqlConnection(ConfigurationManager.ConnectionStrings["DbConnection"].ConnectionString);
                 string query = @"SELECT found = 1 from Users 
                                 WHERE Username = @Username";
 
@@ -380,8 +392,10 @@ namespace DVLDDataAccess
                     }
                 }
 
-                catch (Exception)
+                catch (Exception ex)
                 {
+                    clsSettings.LogError(ex);
+
                     return false;
                 }
 
