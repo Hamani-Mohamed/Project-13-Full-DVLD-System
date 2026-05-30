@@ -1,6 +1,8 @@
-﻿using System;
+using System;
 using System.Data;
 using DVLDDataAccess;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace DVLDBusinessLayer
 {
@@ -27,27 +29,36 @@ namespace DVLDBusinessLayer
             this.Mode = enMode.AddNew;
         }
 
-        private clsUser(int UserID, int PersonID, string FullName, string Username, string Password, bool IsActive)
+        private clsUser(int UserID, int PersonID, string Username, string Password, bool IsActive)
         {
             this.UserID = UserID;
             this.PersonID = PersonID;
-            this.FullName = FullName;
             this.Username = Username;
             this.Password = Password;
             this.IsActive = IsActive;
             PersonInfo = clsPerson._FindPersonByID(this.PersonID);
+
+            if (this.PersonInfo != null)
+            {
+                this.FullName = this.PersonInfo.FullName;
+            }
+            else
+            {
+                this.FullName = "";
+            }
+
             Mode = enMode.UpdateMode;
         }
 
         public static clsUser FindUserByUserID(int UserID)
         {
             int PersonID = -1;
-            string FullName = "", Username = "", Password = "";
+            string Username = "", Password = "";
             bool IsActive = true;
 
             if (clsUsersDataAccess.GetUserInfoByUserID(UserID, ref PersonID, ref Username, ref Password, ref IsActive))
             {
-                return new clsUser(UserID, PersonID, FullName, Username, Password, IsActive);
+                return new clsUser(UserID, PersonID, Username, Password, IsActive);
             }
             else
                 return null;
@@ -56,12 +67,12 @@ namespace DVLDBusinessLayer
         public static clsUser FindUserByPersonID(int PersonID)
         {
             int UserID = -1;
-            string FullName = "", Username = "", Password = "";
+            string Username = "", Password = "";
             bool IsActive = true;
 
             if (clsUsersDataAccess.GetUserInfoByPersonID(ref UserID, PersonID, ref Username, ref Password, ref IsActive))
             {
-                return new clsUser(UserID, PersonID, FullName, Username, Password, IsActive);
+                return new clsUser(UserID, PersonID, Username, Password, IsActive);
             }
             else
                 return null;
@@ -70,12 +81,11 @@ namespace DVLDBusinessLayer
         public static clsUser FindUserByUsernameAndPassword(string Username, string Password)
         {
             int UserID = -1, PersonID = -1; ;
-            string FullName = "";
             bool IsActive = true;
 
             if (clsUsersDataAccess.GetUserInfoByUsernameAndPassword(ref UserID, ref PersonID, Username, Password, ref IsActive))
             {
-                return new clsUser(UserID, PersonID, FullName, Username, Password, IsActive);
+                return new clsUser(UserID, PersonID, Username, Password, IsActive);
             }
             else
                 return null;
@@ -127,8 +137,22 @@ namespace DVLDBusinessLayer
             return clsUsersDataAccess.DoesUserExistByUsername(Username);
         }
 
+        public static string ComputeHash(string input)
+        {
+            using (SHA256 sha256 = SHA256.Create()) //SHA = Secure Hash Algorithms.
+            {
+                // Computing hash value from the UTF-8 encoded input string
+                byte[] hashBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(input));
+
+                // Convert the byte array to a lowercase hexadecimal string
+                return BitConverter.ToString(hashBytes).Replace("-", "");
+            }
+        }
+
         public bool Save()
         {
+            this.Password = ComputeHash(this.Password);
+
             switch (Mode)
             {
                 case enMode.AddNew:
