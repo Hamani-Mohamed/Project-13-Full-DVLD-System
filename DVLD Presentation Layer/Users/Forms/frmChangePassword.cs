@@ -1,4 +1,4 @@
-﻿using DVLDBusinessLayer;
+using DVLDBusinessLayer;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -44,7 +44,7 @@ namespace DVLD
                 return;
             }
 
-            if (txtCurrentPassword.Text != _User.Password)
+            if (clsUtil.ComputeHash(txtCurrentPassword.Text) != _User.Password)
             {
                 errorProvider1.SetError(txtCurrentPassword, "Wrong Password! Try Again...");
                 return;
