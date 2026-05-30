@@ -1,12 +1,6 @@
-﻿using DVLDBusinessLayer;
+using DVLDBusinessLayer;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace DVLD
@@ -30,8 +24,6 @@ namespace DVLD
             {
                 lblUserID.Text = "User ID :        " + user.UserID;
                 txtUsername.Text = user.Username;
-                txtPassword.Text = user.Password;
-                txtConfirm.Text = user.Password;
                 chkActive.Checked = user.IsActive;
             }
             else
@@ -99,10 +91,10 @@ namespace DVLD
                 return;
             }
 
-            // clsPerson person = clsPerson.Find(_PersonID);
+            clsPerson person = clsPerson._FindPersonByID(_PersonID);
 
             user.PersonID = _PersonID;
-            user.FullName = user.PersonInfo.FullName;
+            user.FullName = person.FullName;
             user.Username = txtUsername.Text.Trim();
             user.Password = txtPassword.Text.Trim();
             user.IsActive = chkActive.Checked;
@@ -110,9 +102,6 @@ namespace DVLD
             if (user.Save())
             {
                 lblUserID.Text = "User ID :        " + user.UserID;
-                txtUsername.Text = user.Username;
-                txtPassword.Text = user.Password;
-                txtConfirm.Text = user.Password;
                 chkActive.Checked = user.IsActive;
                 MessageBox.Show("Data Saved Successfully.", "Saved", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 txtPassword.Enabled = false;
